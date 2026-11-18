@@ -122,6 +122,7 @@
       'Tuesday was the original plan, but Thursday is now confirmed. La respuesta al nuevo día es Thursday.',
       'En este entrenador se usa la voz disponible en el navegador. La disponibilidad sin conexión depende de las voces instaladas.']
   ];
+  chapters.push(...window.englishCourse.chapters);
   const root = document.getElementById('reference');
   const category = root.querySelector('select');
   const search = root.querySelector('input');
@@ -173,7 +174,15 @@
       const link=document.createElement('a');
       link.href='https://espikin.es/'+sources[section]; link.target='_blank'; link.rel='noopener noreferrer';
       link.textContent='Ampliar en Espikin';
-      content.append(link); details.append(summary,content); list.append(details);
+      const practise=document.createElement('button');
+      practise.type='button'; practise.className='btn';
+      practise.textContent='Practicar esta sección';
+      practise.onclick=()=>{
+        const match=window.englishCourse.items.find(item=>item.category===section && (item.lesson===title || item.prompt===title || item.lesson?.startsWith(title+' · Pregunta')));
+        const theme=match?.theme || title.replace(' · Ampliación','');
+        window.dispatchEvent(new CustomEvent('english:practice',{detail:{category:section,theme}}));
+      };
+      content.append(link,practise); details.append(summary,content); list.append(details);
     }
   }
   category.onchange=render; search.oninput=render; render();

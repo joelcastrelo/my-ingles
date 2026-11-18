@@ -1536,6 +1536,11 @@ main { max-width: 720px; margin-inline: auto; }
     <p class="text-small" data-status></p>
     <p class="text-small" data-queue></p>
     <h3 data-heading></h3>
+    <details data-theory-panel hidden>
+      <summary>Antes de empezar</summary>
+      <p data-theory></p>
+    </details>
+    <p data-passage lang="en" hidden></p>
     <p data-prompt></p>
     <div class="viz-row">
       <button type="button" class="btn" data-audio hidden>Escuchar</button>
@@ -1722,6 +1727,7 @@ Reading|Detalles y contrastes|B2
 “The return ticket costs less than two singles. It can be used at any time at weekends, but only after 9:30 on weekdays.” ¿Cuándo empieza a ser válido un día laborable? Completa: After ___.|9:30/09:30/9.30/half past nine|Only after introduce la restricción aplicable entre semana.
 “The café still serves the original lunch menu. Customers who order through the website can also choose from three dishes that aren't available in the shop.” Completa: The extra dishes are available only ___.|online/on the website|Still indica que el menú de siempre continúa. Also introduce lo que solo se ofrece por internet.
 </script>
+<script src="course.js"></script>
 <script>
 (() => {
   const root = document.getElementById('english-practice');
@@ -1820,6 +1826,12 @@ Reading|Detalles y contrastes|B2
     for (const [index, [theme, level, prompt, steps, phrases, model]] of entries.entries()) {
       bank.push({category, theme, level, prompt, steps, phrases, model, warmup: category === 'Writing' ? warmups[index] : null});
     }
+  }
+  for (const item of window.englishCourse.items) {
+    if (item.alternatePrompt) {
+      item.alternate = {...item, prompt:item.alternatePrompt, original:item};
+    }
+    bank.push(item);
   }
   const categories = [...new Set(bank.map(item => item.category))];
   const sessions = new Map();
@@ -1973,6 +1985,11 @@ Reading|Detalles y contrastes|B2
     const isProduction = Boolean(current.steps);
     find('status').textContent = current.level + ' · ' + (isReview ? 'Repaso' : session.index + ' de ' + session.pool.length);
     find('heading').textContent = current.theme;
+    find('theory-panel').hidden = !current.theory;
+    find('theory-panel').open = true;
+    find('theory').textContent = current.theory || '';
+    find('passage').hidden = !current.passage;
+    find('passage').textContent = current.passage || '';
     find('prompt').textContent = current.prompt;
     find('prompt').lang = current.category === 'Speaking' ? 'en' : 'es';
     quiz.hidden = isProduction;
@@ -2013,7 +2030,8 @@ Reading|Detalles y contrastes|B2
   function solution() {
     const [first, ...alternatives] = current.valid;
     const sentence = current.prompt.includes('___') ? current.prompt.replace('___', first) : first;
-    return sentence + (alternatives.length ? '\nTambién se acepta: ' + alternatives.join(' · ') : '') + '\n' + current.explanation;
+    return sentence + (alternatives.length ? '\nTambién se acepta: ' + alternatives.join(' · ') : '') + '\n' + current.explanation +
+      (current.speech ? '\nTranscripción: ' + current.speech : '');
   }
   quiz.onsubmit = event => {
     event.preventDefault();
@@ -2082,6 +2100,15 @@ Reading|Detalles y contrastes|B2
   };
   mode.onchange = () => { setTopics(); showExercise(); };
   topic.onchange = showExercise;
+  window.addEventListener('english:practice', event => {
+    const {category,theme} = event.detail || {};
+    if (!categories.includes(category)) return;
+    mode.value=category;
+    setTopics();
+    topic.value=[...topic.options].some(option=>option.value===theme) ? theme : 'Todos';
+    showExercise();
+    root.scrollIntoView({behavior:'smooth'});
+  });
   next.onclick = () => { showExercise(); (quiz.hidden ? next : answer).focus(); };
   populate(mode, categories);
   setTopics();

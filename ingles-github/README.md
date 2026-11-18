@@ -16,7 +16,7 @@ Mantén juntos index.html y library.js y abre index.html con doble clic. Las exp
 6. Abre Settings y después Pages.
 7. En Source elige Deploy from a branch.
 8. Elige la rama main y la carpeta /(root), y pulsa Save.
-9. Espera al despliegue. La dirección aparecerá en Pages, normalmente https://TU-USUARIO.github.io/ingles/.
+9. Espera al despliegue. La dirección aparecerá en Pages, normalmente (https://joelcastrelo.github.io/my-ingles/ingles-github/).
 
 Guía oficial https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site
 
